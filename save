@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+	<meta charset="utf-8">
+	<meta name="viewport" content ="width=device-width,initial-scale=1"> 
+	<title>Bootstrap</title>
+	<link rel="stylesheet"  href="bootstrap.min.css">
+ 	<script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+	<style>
+	[class*="col-"]{
+	padding-top:10px;
+	padding-bottom:10px;
+	padding-left:5px;
+	padding-right:5px;
+	border:1px solid #ddd;
+	border:1px solid rgba(86,61,124,.2);
+	}
+		.navbar
+		{
+		min-height:20px;
+		}
+		#navbar-header{
+		position:relative;
+		top:50px;
+		background-color:#999;
+		border:none;
+		height:40px;
+		}
+		.active{
+		background-color:#7CCD7C;
+		}
+	
+		#ul-header{
+		text-align:center; 
+		font-size:30px;
+		}
+		#ul-header > li > a{
+		height:40px;
+		padding:0px 25px;
+		margin:0px 40px;
+		font-size:25px;
+		line-height:30px;
+		color:#fff;
+		}
+		
+		#ul-header > li > a:hover,#ul-header > li > a:focus,#ul-header>li>a:visited{
+
+		background-color:#7CCD7C;
+		}
+		
+		#album-frame{
+		margin-top:80px;
+		
+		}
+		
+		.col-md-3{
+		width:280px;
+		height:50%;
+		
+		}
+		.col-md-3 > a{
+		text-decoration: none;
+		}
+		.col-md-3 > a:link{
+		color:#333;
+		}
+		.col-md-3>a:hover{
+		 color: #CAFF70;
+		}
+		.col-md-3>a:focus{
+		 color: #CAFF70;
+		}
+		</style>
+		
+		<script>
+		
+		//去除空格的函数
+		function Trim(str)
+		 {
+			   return str.replace(/^\s+|\s+$/g, '');
+		 }
+		
+	
+		 function GetFrame(url,param,value,size)
+		  {
+			
+		     var xmlhttp;
+			  if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+			  xmlhttp=new XMLHttpRequest();
+			  }
+			else
+			  {// code for IE6, IE5
+			  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+			  var urls = url;
+			  if(size>0)
+			 {
+				  urls = urls+"?";
+				 for(var i = 0 ; i < size ; i++)
+				 {
+					 urls = urls+param[i]+"="+value[i]
+					 if(i<size-1)
+						 urls = urls + "&&";
+				 }  	
+			 }
+				
+			  xmlhttp.open("POST",urls,false);
+			  xmlhttp.send();
+			  var tmp = xmlhttp.responseText.valueOf().toString();
+			  tmp = Trim(tmp);
+			  return tmp;
+		  }
+		 
+		 
+		var staticPageCount = 10;
+		var Page = {
+				
+					createNew: function(){
+					var page = {};
+					page.currentPage = 1;
+					page.minPage = 1;
+					page.maxPage = 10;
+					page.totalPage = 100;
+					page.bottomPageCount = 10;
+					page.pageId = "normal-page";
+					
+					page.init = function(){
+						if(page.totalPage < 10)
+						{
+							 page.bottomPageCount = page.totalPage;
+							 page.maxPage = page.bottomPageCount;
+						}
+					   if(page.totalPage <= 1 && itempage.itemLeft > 0)
+							  itempage.itemCount = itempage.itemLeft;
+					}
+					
+					page.refreshPage = function(){
+							   document.getElementById(page.pageId).innerHTML="";
+							   if(page.bottomPageCount > 1){
+										  var main = "";
+										  main = main +"<ul id=\"bottomPageMain\" class=\"pagination\">\n";
+										  main = main +" <li class=\"last-page\"><a href=\"javascript:void(0)\" onclick=\"page.nextPage(-2)\">&laquo;</a></li>\n";
+										  for(var i = page.minPage ; i <= page.maxPage ;i++)
+										  {
+											   main = main+"<li class=\"normal-page\"><a href=\"javascript:void(0)\" onclick=\"page.nextPage("+i+")\">"+i+"</a></li>\n";
+										  }
+										  main = main + 	" <li class=\"next-page\"><a href=\"javascript:void(0)\" onclick=\"page.nextPage(-1)\">&raquo;</a></li>\n";
+										  main = main + "</ul>\n";
+										  document.getElementById(page.pageId).innerHTML=main;
+								  }
+					}
+					
+					page.nextPage = function(num){
+					     
+						  if(num ==- 2)
+						  {
+								 page.currentPage -= 1;
+								if( page.currentPage  < page.minPage)
+								{
+									if( page.currentPage  < 1){
+										 page.currentPage  = 1;
+										return;
+									}
+										
+									var changeLi = document.getElementsByClassName(page.pageId);
+									var scope = Math.min(5,page.minPage - 2);
+									page.minPage  =  page.currentPage  - scope;
+									page.maxPage =  page.currentPage  + page.bottomPageCount - scope - 1;
+									for(var i=page.minPage ; i<= page.maxPage; i++)
+									{
+										var changeLiA = changeLi[i - page.minPage].firstChild;
+										changeLiA.innerHTML = i;
+										changeLiA.setAttribute("onclick","page.nextPage("+String(i)+")");
+									}
+								}
+						  }
+						  else if( num== -1)
+						  {
+								  page.currentPage += 1;
+								
+								if( page.currentPage >page.maxPage)
+								{
+									if( page.currentPage >page.totalPage){
+										 page.currentPage = page.totalPage;
+										return;
+									}	
+									var changeLi = document.getElementsByClassName(page.pageId);
+									var scope = Math.min(5,page.totalPage - page.maxPage);
+									page.maxPage =  page.currentPage  + scope - 1;
+									page.minPage  =  page.currentPage  - page.bottomPageCount +  scope;
+									for(var i = page.minPage; i <= page.maxPage; i++)
+									{
+										
+										var changeLiA = changeLi[i - page.minPage].firstChild;
+										changeLiA.innerHTML = i;
+										changeLiA.setAttribute("onclick","page.nextPage("+String(i)+")");
+									}
+									
+								}
+						  }
+						  else
+						  {
+							  page.currentPage  = num;  
+						  }
+					}
+					
+					return page;
+			}
+		}
+				
+			var Item = {
+					createNew: function(id,name,picture){
+						var item = {};
+						alert(1);
+						item.picture = picture;
+						item.name = name;
+						item.id = id;
+						
+						item.show = function(cla,PCSize,PhoneSize,LScreenSize,link,pos,width,height){
+							var main = "<div id = \""+item.id+"\"class = \"";
+							for(var i = 0 ; i < cla.length ;i++)
+								main += cla[i] + " ";
+							main += "col-md-"+PCSize;
+							main += "\" align =\""+pos+"\"> \n";
+							main += "<a href = \""+link+item.id+"\">\n<img src=\""+item.picture+"\" width = \""+width+"\" height = \""+height"\">\n<br>\n<span align=\"center\">"+item.name+"</span>\n</a>\n</div>
+							alert(main);
+							return main;
+						}
+						
+						item.showBrief = function(cla,PCSize,PhoneSize,LScreenSize,link,pos){
+							var main = "<div id = \""+item.id+"\"class = \"";
+							for(var i = 0 ; i < cla.length ;i++)
+								main += cla[i] + " ";
+							main += "col-md-"+PCSize;
+							main += "\" align =\""+pos+"\"> \n";
+							main += "<a href = \""+link+item.id+"\">\n"+item.name+"</a>\n</div>";
+							return main;
+						}
+						return item;
+					}
+			}
+			
+			var ItemPage = {
+							createNew: function(table,condition,ipp,ipr){
+							var itempage = {};
+							//从数据库中提取所有item
+							itempage.allItem =  0;
+							itempage.allItem = GetFrame("select.jsp",['want','tablename','constraint','limit'],['count(*)',table,condition,'null'],4);
+							itempage.itemPerPage = ipp; //每页放置多少个item
+							itempage.itemPerRow = ipr;//每行防止多少个item
+							itempage.itemCount = ipp; //当前页放多少个item
+							itempage.itemLeft = itempage.allItem % itempage.itemPerPage; //最后一页的item个数 
+							itempage.pageCount = Math.ceil(parseInt(itempage.allItem)/itempage.itemPerPage);//总页数
+							//更新完page后使用
+							itempage.nextPage = function(){					
+									if( page.currentPage  == page.totalPage)
+									{
+										  if(itempage.itemLeft != 0)
+											  itempage.itemCount = itempage.itemLeft;
+								    }
+								   else
+									{
+										  	 itempage.itemCount = itempage.itemPerPage;
+									}
+							}
+							return itempage;
+					}
+				}
+		
+			//page与itempage的组合类
+			var ItemDisplay = {
+				createNew: function(posit,table,condition,ipp,ipr){
+					var display = {};
+					var page = Page.createNew();
+					var itempage = ItemPage.createNew(table,condition,ipp,ipr);
+					page.totalPage = itempage.pageCount; // 计算出来的totalPage以1为最小值
+					page.init();
+					display.data;
+					display.setData = function(str){
+						var str1 = str.split(";");
+						var str2 = new Array();
+						for(var i = 0 ; i < str1.length ; i ++)
+						{
+							var ts = str1[i].split("&&");
+							str2[i] = Item.createNew(ts[0],ts[1],ts[2]);
+					    }
+						display.data = str2;
+					}
+					display.setDataBrief = function(str){
+						
+						var str1 = str.split(";");
+						var str2 = new Array();
+						for(var i = 0 ; i < str1.length ; i ++)
+						{
+							var ts = str1[i].split("&&");
+							str2[i] = Item.createNew(ts[0],ts[1],"");
+					    }
+						display.data = str2;
+					}
+					display.nextPage = function(){
+						page.nextpage();
+						itempage.nextpage();
+					}
+					display.showPage = function(){
+						page.refreshPage();
+					}
+				
+					display.getPage = function(){
+						return page;
+					}
+					display.getItemPage = function(){
+						return itempage;
+					}
+					return display;
+				}
+			}
+		
+		
+		
+		</script>
+		
+		<script>
+		var num = 1;
+		var itemPerPage = 56;
+		var itemPerRow = 4;
+		var display = ItemDisplay.createNew('normal-page','album','null',itemPerPage,itemPerRow);
+		
+
+		function DecorateAlbum()
+		{
+
+				var page = display.getPage();
+				var itempage = display.getItemPage();
+				var datas = GetFrame("select.jsp",['want','tablename','constraint','limit'],['album_id,album_name,album_picture','album_visit','null',itempage.itemCount+','+page.currentPage+','+itemPerPage],4); 
+			    display.setData(datas);
+			    display.showPage();
+		}
+		 
+		function getAlbum()
+		  {
+			  var xmlhttp;
+			  if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+			  xmlhttp=new XMLHttpRequest();
+			  }
+			else
+			  {// code for IE6, IE5
+			  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+			  xmlhttp.onreadystatechange=function()
+			  {
+			  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			    {
+		
+			    document.getElementById("album-frame").innerHTML=xmlhttp.responseText;
+			    
+			    
+			    }
+			  }
+			
+			  var urls = "album.jsp?num="+num;
+			  xmlhttp.open("GET",urls,true);
+			  xmlhttp.send();
+		  }
+		
+		</script>
+		
+		
+	</head>
+		
+<body>
+	<nav id="navbar-header" class = "navbar navbar-inverse " role="navigation" >
+		   <div id="navbar" class="collapse navbar-collapse">
+		   		<ul id="ul-header" class="nav navbar-nav"  >
+		   				<li>	<a href="#"  id = "navbar-headers">首页</a></li>
+		   				<li ><a href="singer.html" 	> 歌手 </a></li>
+		   				<li ><a href="songClass.html"> 歌曲</a></li>
+		   				<li ><a href="album.html" class = "active"> 专辑 </a></li>
+		   	 </ul>
+		   </div>
+	</nav>
+	<div id="album-main">
+		
+		<div id="album-frame" class="container">
+		<script>
+		getAlbum();
+		
+		</script>
+		</div>
+		<div class = "test">
+			<script>
+			DecorateAlbum();
+			</script>
+		</div>
+		<div id="normal-page" >
+			
+		</div>
+	</div>
+	</body>
+	</html>
